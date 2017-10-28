@@ -1,0 +1,14 @@
+<resources>
+	<string name="app_name">FTP Link Downloader</string>
+	<string name="help_introduction">Click any ftp:// link on Android and I should pick it up to download it</string>
+
+	<string name="credentials_startdownload">Start download</string>
+	<string name="credentials_username">Username</string>
+	<string name="credentials_password">Password</string>
+
+	<string name="status_downloads">Downloads</string>
+	<string name="status_downloading">Downloading %1$s</string>
+	<string name="status_ready">%1$s ready</string>
+	<string name="status_needsauth">Authentication required</string>
+	<string name="status_downloadfailed">Download failed</string>
+</resources>
