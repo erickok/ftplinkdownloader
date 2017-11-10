@@ -1,26 +1,30 @@
 <resources>
 
-    <style name="AppTheme" parent="android:Theme.Material.Light.DarkActionBar">
-        <item name="android:colorPrimary">@color/green</item>
-        <item name="android:colorPrimaryDark">@color/green_dark</item>
-        <item name="android:colorAccent">@color/green_light</item>
-        <item name="android:colorControlHighlight">@color/green_light</item>
-        <item name="android:colorButtonNormal">@color/green</item>
-    </style>
+	<style name="AppTheme" parent="android:Theme.Material.Light.DarkActionBar">
+		<item name="android:colorPrimary">@color/green</item>
+		<item name="android:colorPrimaryDark">@color/green_dark</item>
+		<item name="android:colorAccent">@color/green_light</item>
+		<item name="android:colorControlHighlight">@color/green_light</item>
+		<item name="android:colorButtonNormal">@color/green</item>
+		<item name="android:textAppearanceButton">@style/TextAppearance.AppTheme.Widget.Button</item>
+	</style>
 
-    <style name="AppTheme.Transparent" parent="android:Theme.Material.Light.Dialog">
-        <item name="android:colorPrimary">@color/green</item>
-        <item name="android:colorPrimaryDark">@color/green_dark</item>
-        <item name="android:colorAccent">@color/green_light</item>
-        <item name="android:colorControlHighlight">@color/green_light</item>
-        <item name="android:colorButtonNormal">@color/green</item>
+	<style name="AppTheme.Transparent" parent="android:Theme.Material.Light.Dialog">
+		<item name="android:colorPrimary">@color/green</item>
+		<item name="android:colorPrimaryDark">@color/green_dark</item>
+		<item name="android:colorAccent">@color/green_light</item>
+		<item name="android:colorControlHighlight">@color/green_light</item>
+		<item name="android:colorButtonNormal">@color/green</item>
+		<item name="android:textAppearanceButton">@style/TextAppearance.AppTheme.Widget.Button</item>
 
-        <item name="android:windowIsTranslucent">true</item>
-        <item name="android:windowBackground">@android:color/transparent</item>
-        <item name="android:windowContentOverlay">@null</item>
-        <item name="android:windowNoTitle">true</item>
-        <!--<item name="android:windowIsFloating">true</item>-->
-        <item name="android:backgroundDimEnabled">false</item>
-    </style>
+		<item name="android:windowIsTranslucent">true</item>
+		<item name="android:windowContentOverlay">@null</item>
+		<item name="android:windowNoTitle">true</item>
+		<item name="android:windowIsFloating">true</item>
+		<item name="android:backgroundDimEnabled">true</item>
+	</style>
 
+	<style name="TextAppearance.AppTheme.Widget.Button" parent="@android:style/TextAppearance.Material.Widget.Button">
+		<item name="android:textColor">@android:color/white</item>
+	</style>
 </resources>

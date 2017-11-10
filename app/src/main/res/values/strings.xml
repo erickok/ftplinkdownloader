@@ -6,9 +6,17 @@
 	<string name="credentials_username">Username</string>
 	<string name="credentials_password">Password</string>
 
+	<string name="permission_required">To download files, we need a storage permission</string>
+	<string name="permission_missing">Can\'t write download without permission</string>
+
 	<string name="status_downloads">Downloads</string>
 	<string name="status_downloading">Downloading %1$s</string>
 	<string name="status_ready">%1$s ready</string>
+	<string name="status_open">Open</string>
 	<string name="status_needsauth">Authentication required</string>
 	<string name="status_downloadfailed">Download failed</string>
+	<string name="status_storagefull">Insufficient storage space</string>
+	<string name="status_filenotfound">File does not exist on server</string>
+	<string name="status_retry">Retry</string>
+	<string name="status_cancel">Cancel</string>
 </resources>

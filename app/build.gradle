@@ -26,14 +26,11 @@ dependencies {
 
     // Support libs
     implementation 'com.android.support:support-core-utils:26.1.0'
-//    implementation 'com.android.support:appcompat-v7:26.1.0'
-//    implementation 'com.android.support:design:26.1.0'
 
     // Kategory
     implementation 'io.kategory:kategory:0.3.10'
+    //implementation 'io.kategory:kategory-effects:0.3.10'
 
-    testImplementation 'junit:junit:4.12'
-    androidTestImplementation('com.android.support.test.espresso:espresso-core:3.0.1', {
-        exclude group: 'com.android.support', module: 'support-annotations'
-    })
+    // Commons Net for FTP
+    implementation 'commons-net:commons-net:3.6'
 }
