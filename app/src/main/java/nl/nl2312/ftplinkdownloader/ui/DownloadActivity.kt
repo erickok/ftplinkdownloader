@@ -47,8 +47,8 @@ class DownloadActivity : Activity() {
 
         startService(Intent(this, DownloadService::class.java)
                 .setDataAndType(intent?.data, intent?.type)
-                .putExtra(DownloadService.EXTRA_USERNAME, username)
-                .putExtra(DownloadService.EXTRA_PASSWORD, password))
+                .putExtra(DownloadService.EXTRA_USERNAME, username.toString())
+                .putExtra(DownloadService.EXTRA_PASSWORD, password.toString()))
         finish()
     }
 

@@ -13,6 +13,7 @@
 	<string name="status_downloading">Downloading %1$s</string>
 	<string name="status_ready">%1$s ready</string>
 	<string name="status_open">Open</string>
+	<string name="status_noconnection">No connection available</string>
 	<string name="status_needsauth">Authentication required</string>
 	<string name="status_downloadfailed">Download failed</string>
 	<string name="status_storagefull">Insufficient storage space</string>

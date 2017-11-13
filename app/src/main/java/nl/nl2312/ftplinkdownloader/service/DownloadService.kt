@@ -14,6 +14,7 @@ import android.webkit.MimeTypeMap
 import kategory.*
 import nl.nl2312.ftplinkdownloader.R
 import nl.nl2312.ftplinkdownloader.extensions.div
+import nl.nl2312.ftplinkdownloader.extensions.hasNetworkConnected
 import nl.nl2312.ftplinkdownloader.ui.DownloadActivity
 import java.util.concurrent.CountDownLatch
 
@@ -23,7 +24,7 @@ class DownloadService : IntentService("DownloadService") {
 
         // Determine url, mime type and potentially login credentials
         val maybeUri: Option<Uri> = Option.fromNullable(intent?.data)
-                .filter { it.scheme == "ftp" }
+                .filter { it.scheme == "ftp" && it.lastPathSegment != null && it.lastPathSegment.isNotEmpty() }
         val mime: String = Option.fromNullable(intent?.type)
                 .filter { it.isNotEmpty() }
                 .getOrElse {
@@ -42,6 +43,7 @@ class DownloadService : IntentService("DownloadService") {
         })
         val maybeCredentials: Option<Credentials> = maybeIntentCredentials.fold({ maybeUriCredentials }, { Option.pure(it) })
 
+        // Download, with notification feedback
         maybeUri.map { Link(it, mime, maybeCredentials) }.fold({
             Log.w(TAG, "No supported URI supplied to download (was $maybeUri))")
         }, { link ->
@@ -57,10 +59,12 @@ class DownloadService : IntentService("DownloadService") {
         val file = path / link.uri.lastPathSegment
         path.mkdirs()
 
-        // TODO Check connection and throw specific error
+        // Short circuit if no connection is available
+        if (!hasNetworkConnected()) {
+            after(DownloadFailure.NO_CONNECTION.right())
+        }
 
-        // Ensure existing empty file
-        // TODO Use a different name instead of override
+        // Ensure no file with the given name exists: this overrides any existing file
         if (file.exists()) {
             file.delete()
         }
@@ -97,14 +101,14 @@ class DownloadService : IntentService("DownloadService") {
                 .setContentText(link.uri.toString())
                 .setTicker(title)
                 // TODO Make cancelling work
-                .addAction(R.drawable.ic_stat_action_cancel, getString(R.string.status_cancel), PendingIntent.getActivity(
+                /*.addAction(R.drawable.ic_stat_action_cancel, getString(R.string.status_cancel), PendingIntent.getActivity(
                         applicationContext,
                         0,
                         Intent(applicationContext, DownloadActivity::class.java)
                                 .setDataAndType(link.uri, link.mime)
                                 .putExtra(DownloadActivity.EXTRA_REQUEST_AUTHENTICATION, true),
                         PendingIntent.FLAG_UPDATE_CURRENT
-                ))
+                ))*/
                 .build())
     }
 
@@ -119,6 +123,7 @@ class DownloadService : IntentService("DownloadService") {
                     .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                     .setContentTitle(getString(R.string.status_ready, link.uri.lastPathSegment))
                     .apply {
+                        // Adds an Open action if we know the Uri of the file
                         outputFile.map {
                             addAction(R.drawable.ic_stat_action_open, getString(R.string.status_open), PendingIntent.getActivity(
                                     applicationContext,
@@ -154,6 +159,7 @@ class DownloadService : IntentService("DownloadService") {
                     builder
                             .setPriority(NotificationCompat.PRIORITY_HIGH)
                             .setContentTitle(getString(when (it) {
+                                DownloadFailure.NO_CONNECTION -> R.string.status_noconnection
                                 DownloadFailure.FILE_NOT_FOUND -> R.string.status_filenotfound
                                 DownloadFailure.STORAGE_FULL -> R.string.status_storagefull
                                 else -> R.string.status_downloadfailed

@@ -33,6 +33,7 @@ object Downloader {
         try {
 
             // Connect and log in
+            client.autodetectUTF8 = true
             client.connect(link.uri.host, port)
             if (!FTPReply.isPositiveCompletion(client.replyCode)) {
                 throw IOException("Unexpected reply code ${client.replyCode} on connecting")
@@ -97,6 +98,7 @@ object Downloader {
 class AuthenticationException(username: String) : Exception("Authentication failed for $username")
 
 enum class DownloadFailure {
+    NO_CONNECTION,
     AUTHENTICATION_FAILED,
     FILE_NOT_FOUND,
     STORAGE_FULL,
