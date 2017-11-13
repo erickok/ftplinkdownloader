@@ -25,7 +25,10 @@ class DownloadService : IntentService("DownloadService") {
 
         // Determine url, mime type and potentially login credentials
         val maybeUri: Option<Uri> = Option.fromNullable(intent?.data)
-                .filter { it.scheme == "ftp" && it.lastPathSegment != null && it.lastPathSegment.isNotEmpty() }
+                // Only FPT and FTPS links supported
+                .filter { it.scheme == "ftp" || it.scheme == "ftps" }
+                // File need to be explicitly specified
+                .filter { it.lastPathSegment != null && it.lastPathSegment.isNotEmpty() }
         val mime: String = Option.fromNullable(intent?.type)
                 .filter { it.isNotEmpty() }
                 .getOrElse {

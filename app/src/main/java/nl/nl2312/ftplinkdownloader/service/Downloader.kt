@@ -23,11 +23,9 @@ object Downloader {
 
         // Set up an FTP client
         val isFtps = link.uri.isFtps
-        val port = link.uri.portOrDefault(if (isFtps) 433 else 21)
+        val port = link.uri.portOrDefault(21)
         val client: FTPClient = if (isFtps) {
-            FTPSClient(true).apply {
-                trustManager = TrustManagerUtils.getValidateServerCertificateTrustManager()
-            }
+            FTPSClient(false)
         } else {
             FTPClient()
         }
