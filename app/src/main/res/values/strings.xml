@@ -9,7 +9,7 @@
 	<string name="permission_required">To download files, we need a storage permission</string>
 	<string name="permission_missing">Can\'t write download without permission</string>
 
-	<string name="status_downloads">Downloads</string>
+	<string name="status_downloadschannel">Download notifications</string>
 	<string name="status_downloading">Downloading %1$s</string>
 	<string name="status_ready">%1$s ready</string>
 	<string name="status_open">Open</string>

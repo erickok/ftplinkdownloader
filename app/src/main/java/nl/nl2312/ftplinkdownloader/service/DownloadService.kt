@@ -14,6 +14,7 @@ import android.webkit.MimeTypeMap
 import kategory.*
 import nl.nl2312.ftplinkdownloader.R
 import nl.nl2312.ftplinkdownloader.extensions.div
+import nl.nl2312.ftplinkdownloader.extensions.extension
 import nl.nl2312.ftplinkdownloader.extensions.hasNetworkConnected
 import nl.nl2312.ftplinkdownloader.ui.DownloadActivity
 import java.util.concurrent.CountDownLatch
@@ -181,7 +182,7 @@ class DownloadService : IntentService("DownloadService") {
 
     private fun notify(notification: Notification) {
         (getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager).apply {
-            ensureNotificationChannel(DownloadService.NOTIFICATION_CHANNEL_ID, getString(R.string.status_downloads))
+            ensureNotificationChannel(DownloadService.NOTIFICATION_CHANNEL_ID, getString(R.string.status_downloadschannel))
             notify(NOTIFICATION_ID, notification)
         }
     }
@@ -196,15 +197,6 @@ class DownloadService : IntentService("DownloadService") {
     }
 
 }
-
-data class Link(
-        val uri: Uri,
-        val mime: String,
-        val credentials: Option<Credentials>)
-
-data class Credentials(
-        val username: String,
-        val password: String)
 
 private fun NotificationManager.ensureNotificationChannel(channelId: String, name: String) {
 

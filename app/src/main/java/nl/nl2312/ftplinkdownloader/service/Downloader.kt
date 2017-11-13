@@ -4,6 +4,8 @@ import android.system.ErrnoException
 import kategory.Either
 import kategory.left
 import kategory.right
+import nl.nl2312.ftplinkdownloader.extensions.isFtps
+import nl.nl2312.ftplinkdownloader.extensions.portOrDefault
 import org.apache.commons.net.ftp.FTP
 import org.apache.commons.net.ftp.FTPClient
 import org.apache.commons.net.ftp.FTPReply
@@ -61,7 +63,8 @@ object Downloader {
 
             // Stream file contents
             localFile.outputStream().use { localStream ->
-                val remoteStream: InputStream = client.retrieveFileStream(link.uri.lastPathSegment) ?: throw FileNotFoundException()
+                val remoteStream: InputStream = client.retrieveFileStream(link.uri.lastPathSegment)
+                        ?: throw FileNotFoundException()
                 remoteStream.use {
                     it.copyTo(localStream)
                 }

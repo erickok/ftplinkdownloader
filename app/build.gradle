@@ -11,11 +11,12 @@ android {
         targetSdkVersion 26
         versionCode 1
         versionName "1.0"
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+        resConfigs "en"
     }
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
@@ -24,13 +25,12 @@ android {
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
 
-    // Support libs
+    // Support lib
     implementation 'com.android.support:support-core-utils:26.1.0'
 
     // Kategory
     implementation 'io.kategory:kategory:0.3.10'
-    //implementation 'io.kategory:kategory-effects:0.3.10'
 
-    // Commons Net for FTP
+    // Commons Net for FTP client
     implementation 'commons-net:commons-net:3.6'
 }

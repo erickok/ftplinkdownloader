@@ -1,4 +1,4 @@
-package nl.nl2312.ftplinkdownloader.service
+package nl.nl2312.ftplinkdownloader.extensions
 
 import android.net.Uri
 
