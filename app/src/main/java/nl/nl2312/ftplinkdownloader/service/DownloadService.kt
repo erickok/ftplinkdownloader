@@ -97,6 +97,9 @@ class DownloadService : IntentService("DownloadService") {
         val title = getString(R.string.status_downloading, link.uri.lastPathSegment)
         startForeground(NOTIFICATION_ID, NotificationCompat.Builder(applicationContext, NOTIFICATION_CHANNEL_ID)
                 .setOngoing(true)
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                // TODO Make progress work
+                //.setProgress()
                 .setSmallIcon(R.drawable.ic_stat_downloading)
                 .setContentTitle(title)
                 .setContentText(link.uri.toString())

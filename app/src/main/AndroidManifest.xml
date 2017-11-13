@@ -25,6 +25,7 @@
 		<activity
 			android:name=".ui.DownloadActivity"
 			android:exported="true"
+			android:noHistory="true"
 			android:theme="@style/AppTheme.Transparent">
 			<intent-filter>
 				<action android:name="android.intent.action.VIEW" />
