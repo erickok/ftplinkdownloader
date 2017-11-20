@@ -58,14 +58,14 @@ class DownloadService : IntentService("DownloadService") {
         })
     }
 
-    private fun download(link: Link, after: (Either<Option<Uri>, DownloadFailure>) -> Unit) {
+    private fun download(link: Link, after: (Either<DownloadFailure, Option<Uri>>) -> Unit) {
         val path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
         val file = path / link.uri.lastPathSegment
         path.mkdirs()
 
         // Short circuit if no connection is available
         if (!hasNetworkConnected()) {
-            after(DownloadFailure.NO_CONNECTION.right())
+            after(DownloadFailure.NO_CONNECTION.left())
         }
 
         // Ensure no file with the given name exists: this overrides any existing file
@@ -78,6 +78,8 @@ class DownloadService : IntentService("DownloadService") {
 
         // Handle download result and return it
         val result = download.fold({
+            it.left()
+        }, {
 
             // Add to the Android downloads
             val lock = CountDownLatch(1)
@@ -88,9 +90,7 @@ class DownloadService : IntentService("DownloadService") {
             })
             lock.await()
 
-            Option.fromNullable(scannerUri).left()
-        }, {
-            it.right()
+            Option.fromNullable(scannerUri).right()
         })
 
         after(result)
@@ -119,31 +119,12 @@ class DownloadService : IntentService("DownloadService") {
                 .build())
     }
 
-    private fun showResult(link: Link, result: Either<Option<Uri>, DownloadFailure>) {
+    private fun showResult(link: Link, result: Either<DownloadFailure, Option<Uri>>) {
         stopForeground(true)
         val builder = NotificationCompat.Builder(applicationContext, NOTIFICATION_CHANNEL_ID)
                 .setAutoCancel(true)
                 .setSmallIcon(R.drawable.ic_stat_downloading)
-        result.fold({ outputFile ->
-            // Success: allow opening of the file
-            notify(builder
-                    .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                    .setContentTitle(getString(R.string.status_ready, link.uri.lastPathSegment))
-                    .apply {
-                        // Adds an Open action if we know the Uri of the file
-                        outputFile.map {
-                            addAction(R.drawable.ic_stat_action_open, getString(R.string.status_open), PendingIntent.getActivity(
-                                    applicationContext,
-                                    0,
-                                    Intent(Intent.ACTION_VIEW).apply {
-                                        setDataAndType(it, link.mime)
-                                        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                                    },
-                                    PendingIntent.FLAG_UPDATE_CURRENT))
-                        }
-                    }
-                    .build())
-        }, {
+        result.fold({
             // Failure: allow applicable retry
             notify(when (it) {
                 DownloadFailure.AUTHENTICATION_FAILED -> {
@@ -183,6 +164,25 @@ class DownloadService : IntentService("DownloadService") {
                             .build()
                 }
             })
+        }, { outputFile ->
+            // Success: allow opening of the file
+            notify(builder
+                    .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                    .setContentTitle(getString(R.string.status_ready, link.uri.lastPathSegment))
+                    .apply {
+                        // Adds an Open action if we know the Uri of the file
+                        outputFile.map {
+                            addAction(R.drawable.ic_stat_action_open, getString(R.string.status_open), PendingIntent.getActivity(
+                                    applicationContext,
+                                    0,
+                                    Intent(Intent.ACTION_VIEW).apply {
+                                        setDataAndType(it, link.mime)
+                                        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                                    },
+                                    PendingIntent.FLAG_UPDATE_CURRENT))
+                        }
+                    }
+                    .build())
         })
     }
 
