@@ -37,15 +37,14 @@ object Downloader {
             if (!FTPReply.isPositiveCompletion(client.replyCode)) {
                 throw IOException("Unexpected reply code ${client.replyCode} on connecting")
             }
-            link.credentials.fold({
-                if (!client.login("anonymous", "")) {
-                    throw AuthenticationException("anonymous")
-                }
-            }, {
+            link.credentials?.let {
                 if (!client.login(it.username, it.password)) {
                     throw AuthenticationException(it.username)
                 }
-            })
+            } ?: if (!client.login("anonymous", "")) {
+                throw AuthenticationException("anonymous")
+            }
+
 
             // Prepare file transfer
             client.setFileType(FTP.BINARY_FILE_TYPE)

@@ -11,11 +11,14 @@ import android.os.Environment
 import android.support.v4.app.NotificationCompat
 import android.util.Log
 import android.webkit.MimeTypeMap
-import kategory.*
+import kategory.Either
+import kategory.left
+import kategory.right
 import nl.nl2312.ftplinkdownloader.R
 import nl.nl2312.ftplinkdownloader.extensions.div
 import nl.nl2312.ftplinkdownloader.extensions.extension
 import nl.nl2312.ftplinkdownloader.extensions.hasNetworkConnected
+import nl.nl2312.ftplinkdownloader.extensions.whenNotNull
 import nl.nl2312.ftplinkdownloader.ui.DownloadActivity
 import java.util.concurrent.CountDownLatch
 
@@ -24,41 +27,42 @@ class DownloadService : IntentService("DownloadService") {
     override fun onHandleIntent(intent: Intent?) {
 
         // Determine url, mime type and potentially login credentials
-        val maybeUri: Option<Uri> = Option.fromNullable(intent?.data)
+        val maybeUri: Uri? = intent?.data
                 // Only FPT and FTPS links supported
-                .filter { it.scheme == "ftp" || it.scheme == "ftps" }
+                ?.takeIf { it.scheme == "ftp" || it.scheme == "ftps" }
                 // File need to be explicitly specified
-                .filter { it.lastPathSegment != null && it.lastPathSegment.isNotEmpty() }
-        val mime: String = Option.fromNullable(intent?.type)
-                .filter { it.isNotEmpty() }
-                .getOrElse {
-                    // Determine mime type based on url (file) extensions
-                    MimeTypeMap.getSingleton().getMimeTypeFromExtension(intent?.data?.extension()) ?: "application/octet-stream"
+                ?.takeIf { it.lastPathSegment != null && it.lastPathSegment.isNotEmpty() }
+        val mime: String = intent?.type
+                ?.takeIf { it.isNotEmpty() }
+                // Determine mime type based on url (file) extensions
+                ?: MimeTypeMap.getSingleton().getMimeTypeFromExtension(intent?.data?.extension()) ?: "application/octet-stream"
+
+        val maybeIntentCredentials: Credentials? =
+                whenNotNull(intent?.getStringExtra(EXTRA_USERNAME), intent?.getStringExtra(EXTRA_PASSWORD)) { username, password ->
+                    Credentials(username, password)
                 }
-        val maybeIntentCredentials = Option.monad().map(
-                Option.fromNullable(intent?.getStringExtra(EXTRA_USERNAME)),
-                Option.fromNullable(intent?.getStringExtra(EXTRA_PASSWORD)),
-                { (username, password) -> Credentials(username, password) }).ev()
-        val maybeUriCredentials: Option<Credentials> = maybeUri.fold({ Option.empty() }, {
+        val maybeUriCredentials: Credentials? = maybeUri?.let {
             val uriUserAndPassword = it.encodedUserInfo?.split(":")
-            val maybeUriUser = Option.fromNullable(uriUserAndPassword?.getOrNull(0))
-            val maybeUriPassword = Option.fromNullable(uriUserAndPassword?.getOrNull(1))
-            Option.monad().map(maybeUriUser, maybeUriPassword, { (username, password) -> Credentials(username, password) }).ev()
-        })
-        val maybeCredentials: Option<Credentials> = maybeIntentCredentials.fold({ maybeUriCredentials }, { Option.pure(it) })
+            val maybeUriUser: String? = uriUserAndPassword?.getOrNull(0)
+            val maybeUriPassword: String? = uriUserAndPassword?.getOrNull(1)
+            whenNotNull(maybeUriUser, maybeUriPassword) { username, password ->
+                Credentials(username, password)
+            }
+        }
+        val maybeCredentials: Credentials? = maybeIntentCredentials ?: maybeUriCredentials
 
         // Download, with notification feedback
-        maybeUri.map { Link(it, mime, maybeCredentials) }.fold({
-            Log.w(TAG, "No supported URI supplied to download (was $maybeUri))")
-        }, { link ->
+        maybeUri?.let {
+            Link(it, mime, maybeCredentials)
+        }?.let { link ->
             showDownloading(link)
             download(link) {
                 showResult(link, it)
             }
-        })
+        } ?: Log.w(TAG, "No supported URI supplied to download (was $maybeUri))")
     }
 
-    private fun download(link: Link, after: (Either<DownloadFailure, Option<Uri>>) -> Unit) {
+    private fun download(link: Link, after: (Either<DownloadFailure, Uri?>) -> Unit) {
         val path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
         val file = path / link.uri.lastPathSegment
         path.mkdirs()
@@ -90,7 +94,7 @@ class DownloadService : IntentService("DownloadService") {
             })
             lock.await()
 
-            Option.fromNullable(scannerUri).right()
+            scannerUri.right()
         })
 
         after(result)
@@ -119,7 +123,7 @@ class DownloadService : IntentService("DownloadService") {
                 .build())
     }
 
-    private fun showResult(link: Link, result: Either<DownloadFailure, Option<Uri>>) {
+    private fun showResult(link: Link, result: Either<DownloadFailure, Uri?>) {
         stopForeground(true)
         val builder = NotificationCompat.Builder(applicationContext, NOTIFICATION_CHANNEL_ID)
                 .setAutoCancel(true)
@@ -171,7 +175,7 @@ class DownloadService : IntentService("DownloadService") {
                     .setContentTitle(getString(R.string.status_ready, link.uri.lastPathSegment))
                     .apply {
                         // Adds an Open action if we know the Uri of the file
-                        outputFile.map {
+                        outputFile?.let {
                             addAction(R.drawable.ic_stat_action_open, getString(R.string.status_open), PendingIntent.getActivity(
                                     applicationContext,
                                     0,
