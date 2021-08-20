@@ -4,7 +4,7 @@ A simple app to download FTP (ftp://, ftps://) links and Android.
 
 <a href='https://play.google.com/store/apps/details?id=nl.nl2312.ftplinkdownloader&pcampaignid=MKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1'><img alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png' width='175'/></a>
 
-While Android itself and any common browser supports downlaoding of http:// links to your device, no support for FTP exists. This app supports basic easy downloading of FTP-hosted files by responding to ftp:// or ftps:// scheme links clicked in any app.
+While Android itself and any common browser supports downloading of http:// links to your device, no support for FTP exists. This app supports basic easy downloading of FTP-hosted files by responding to ftp:// or ftps:// scheme links clicked in any app.
 
   - Plain FTP and secure FTPS (aka FTP-ES and FTP-SSL) supported
   - Username/password authentication support
